@@ -1,43 +1,67 @@
 package rental;
-
 public class RentalPriceCalculator {
-	
-	// age - age of driver
-	// licence - number of full years person holds driving licence
-	// clazz - class of the car from 1 (smallest) to 5 (largest) that person wishes to rent
-	// acc - has s/he caused any accidents within last year
-	// acc2 - has s/he participated (but not caused) in any accidents within last year
-	// season - if it is high season or not
-	public double price(int age, int licence, int clazz, boolean acc, boolean acc2, boolean season) {
-		
-		if (age < 18) {
-			throw new IllegalArgumentException("Driver too young - cannot quote the price");
-		}
-		if (age <= 21 && clazz > 2) {
-			throw new UnsupportedOperationException("Drivers 21 y/o or less can only rent Class 1 vehicles");
-		}
-		
-		double rentalprice = age;
-		
-		if (clazz >=4 && age <= 25 && season != false) {
-			rentalprice = rentalprice * 2;
-		}
-		
-		if (licence < 1) {
-			throw new IllegalArgumentException("Driver must hold driving licence at least for one year. Can not rent a car!");
-		}
-		
-		if (licence < 3) {
-			rentalprice = rentalprice * 1.3;
-		}
-		
-		if (acc == true && age < 30) {
-			rentalprice += 15;
+
+	public static final int MINIMUM_DRIVING_AGE = 18;
+	public static final int MINIMUM_AGE_FOR_CLASS1_VEHICLES = 21;
+	public static final int COMPACT_CARCLASS = 2;
+	public static final int SEASONAL_COEFFICENT = 2;
+	public static final int IN_MIDDLE_TWENTIES = 25;
+	public static final int FULLSIZE_CARCLASS = 4;
+	public static final int MINIMUM_AGE_OF_OWNING_LICENCE_FOR_RENT = 1;
+	public static final double RENTAL_PRICE_COEFFICENT = 1.3;
+	public static final int STILL_DANGEROUS_GUY_ON_THE_ROAD = 3;
+	public static final int ACCIDENT_ADDITIONAL_FEE_FOR_UNDER_THERTHY = 15;
+	public static final int MIDDLE_AGE = 30;
+	public static final double MAXIMUM_RENTAL_PRICE = 1000.00;
+
+	public void startCounting(int driverAge, int licence, int carClass, boolean causedAccident, boolean partInAccident, boolean highRentSeason) {
+        RentalPriceCalculator start = new RentalPriceCalculator();
+		start.rentExeptions(driverAge, carClass, licence, causedAccident, highRentSeason );
+	}
+
+    public  String rentExeptions (int driverAge, int carClass, int licence,boolean causedAccident, boolean highRentSeason){
+		String exeptionalMessage ="";
+
+		if (driverAge < MINIMUM_DRIVING_AGE) {
+			exeptionalMessage = "Driver too young - cannot quote the price";
 		}
 
-		if (rentalprice > 1000) {
-			return 1000.00;
+		if (driverAge <= MINIMUM_AGE_FOR_CLASS1_VEHICLES && carClass > COMPACT_CARCLASS) {
+			exeptionalMessage = "Drivers 21 y/o or less can only rent Class 1 vehicles";
+
 		}
-		return rentalprice;
+		if (licence < MINIMUM_AGE_OF_OWNING_LICENCE_FOR_RENT) {
+			exeptionalMessage = "Driver must hold driving licence at least for one year. Can not rent a car!";
+		}
+		else {
+            exeptionalMessage="";
+		    return  rentalPriceCount(driverAge, licence, carClass, causedAccident, highRentSeason);
+        }
+        System.out.print(exeptionalMessage);
+		return exeptionalMessage;
 	}
+
+	public String rentalPriceCount(int driverAge, int licence, int carClass, boolean causedAccident, boolean highRentSeason){
+
+	    double rentalPrice=driverAge;
+
+        if (carClass >= FULLSIZE_CARCLASS && driverAge <= IN_MIDDLE_TWENTIES && highRentSeason != false) {
+            rentalPrice = rentalPrice * SEASONAL_COEFFICENT;
+        }
+
+        if (licence < STILL_DANGEROUS_GUY_ON_THE_ROAD) {
+            rentalPrice = rentalPrice * RENTAL_PRICE_COEFFICENT;
+        }
+
+        if (causedAccident == true && driverAge < MIDDLE_AGE) {
+            rentalPrice += ACCIDENT_ADDITIONAL_FEE_FOR_UNDER_THERTHY;
+        }
+
+        if (rentalPrice > MAXIMUM_RENTAL_PRICE) {
+            String maxRentPrice = Double.toString(MAXIMUM_RENTAL_PRICE);
+            return maxRentPrice;
+        }
+        String result=Double.toString(rentalPrice);
+        return result;
+    }
 }
